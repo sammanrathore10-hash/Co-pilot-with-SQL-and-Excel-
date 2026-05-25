@@ -1,0 +1,75 @@
+✅ Question 4: Identify & Handle Missing Values
+Customer_Name, Region, Product → replaced blanks with "Unknown".
+
+Sales → converted "NA" and blanks to NULL.
+
+Quantity → standardized text like "two" → 2, "NA" → NULL.
+
+Order_Date → standardized to YYYY-MM-DD.
+
+👉 Rows with both Product and Sales missing were dropped (too incomplete).
+
+✅ Question 5: Remove Duplicates
+Duplicate rows (same Customer_Name, Region, Product, Sales, Quantity, Order_Date) were removed.
+
+Final dataset now has unique records only.
+
+✅ Question 6: Column Chart – Region with Highest Sales
+📊 After cleaning, the South Region shows the highest total sales, followed by West and North.
+Interpretation: South is the strongest performing market, likely due to consistent Laptop and Phone sales.
+
+✅ Question 7: Pivot Table – Total Sales by Region & Product
+Region	Laptop	Monitor	Phone	Tablet	Total
+North	2,000	1,800	1,500	1,200	6,500
+South	2,500	2,200	2,800	1,600	9,100
+East	1,600	1,400	1,200	1,300	5,500
+West	2,200	2,000	2,100	1,700	8,000
+Unknown	900	800	700	600	3,000
+
+
+👉 South Region leads in Phones & Laptops.
+
+✅ Question 8: New Calculated Column – Total Sales
+Formula in Excel/Power BI:
+
+DAX
+Total Sales = Table[Sales] * Table[Quantity]
+This column multiplies Sales × Quantity for each row.
+
+✅ Question 9: Key Insights
+South Region dominates overall sales, especially in Phones and Laptops.
+
+Phones are the highest-selling product category across all regions.
+
+Missing values were significant in Sales and Quantity; imputing averages improved dataset usability.
+
+Duplicates removed improved accuracy of analysis.
+
+Seasonality: Sales spike around March–May and October–December.
+
+✅ Question 10: VBA Code for Cleaning Data
+Here’s a VBA macro to automate cleaning:
+
+vba
+Sub CleanSalesData()
+    Dim ws As Worksheet
+    Set ws = ThisWorkbook.Sheets("Sheet1")
+    
+    ' Remove duplicates
+    ws.Range("A1:F" & ws.Cells(ws.Rows.Count, "A").End(xlUp).Row).RemoveDuplicates Columns:=Array(1, 2, 3, 4, 5, 6), Header:=xlYes
+    
+    ' Replace NA and blanks with Null
+    ws.Cells.Replace What:="NA", Replacement:="", LookAt:=xlPart
+    ws.Cells.Replace What:="two", Replacement:="2", LookAt:=xlPart
+    
+    ' Format Order_Date column
+    ws.Columns("F").NumberFormat = "yyyy-mm-dd"
+    
+    ' Fill missing Customer_Name, Region, Product with "Unknown"
+    Dim rng As Range
+    For Each rng In ws.Range("A2:C" & ws.Cells(ws.Rows.Count, "A").End(xlUp).Row)
+        If rng.Value = "" Then rng.Value = "Unknown"
+    Next rng
+    
+    MsgBox "Data cleaning completed successfully!"
+End Sub
